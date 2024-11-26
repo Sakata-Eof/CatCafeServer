@@ -69,6 +69,16 @@ public class CatController {
 	public Result del(@PathVariable("catIDs") String catIDs) {
 		String[] split = catIDs.split(",");
 		List<Integer> list = Arrays.stream(split).map(Integer::parseInt).toList();
+		for (Integer i : list) {
+			File file = new File(UPLOAD_FOLDER
+					+catService
+					.getOne(Wrappers.<Cat>lambdaQuery()
+							.eq(Cat::getCatID, i)).getCatImage());
+			// 路径为文件且不为空则进行删除
+			if (file.isFile() && file.exists()) {
+				file.delete();
+			}
+		}
 		catService.remove(Wrappers.<Cat>lambdaQuery()
 				.in(Cat::getCatID, list)
 		);
