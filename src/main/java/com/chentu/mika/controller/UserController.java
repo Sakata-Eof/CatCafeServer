@@ -7,7 +7,6 @@ import com.chentu.mika.model.form.LoginForm;
 import com.chentu.mika.model.result.Result;
 import com.chentu.mika.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,7 +24,7 @@ public class UserController {
 	UserService userService;
 	@PostMapping("/login")
 	public Result login(@RequestBody LoginForm form) {
-		if(form.getUserEmail()!=null||form.getUserId()!=null||form.getUserName()!=null){
+		if(form.getUserEmail()!=null||form.getUserID()!=null||form.getUserName()!=null){
 			if(form.getUserEmail()!=null) {
 				User one = userService.getOne(Wrappers.<User>lambdaQuery()
 						.eq(User::getUserEmail, form.getUserEmail())
@@ -43,9 +42,9 @@ public class UserController {
 
 				return Result.success(sign);
 			}
-			if(form.getUserId()!=null) {
+			if(form.getUserID()!=null) {
 				User one = userService.getOne(Wrappers.<User>lambdaQuery()
-						.eq(User::getUserID, form.getUserEmail())
+						.eq(User::getUserID, form.getUserID())
 						.eq(User::getUserPassword, form.getUserPassword())
 				);
 				if (one == null) {
@@ -62,7 +61,7 @@ public class UserController {
 			}
 			if(form.getUserName()!=null) {
 				User one = userService.getOne(Wrappers.<User>lambdaQuery()
-						.eq(User::getUserName, form.getUserEmail())
+						.eq(User::getUserName, form.getUserName())
 						.eq(User::getUserPassword, form.getUserPassword())
 				);
 				if (one == null) {
@@ -80,7 +79,7 @@ public class UserController {
 			return Result.fail("");
 		}
 		else {
-			throw new RuntimeException("三个参数为空");
+			return Result.fail("三个参数为空");
 		}
 	}
 	

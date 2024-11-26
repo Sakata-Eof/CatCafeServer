@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Data
 public class CatForm implements Serializable {
 	
-	Integer catId;
+	Integer catID;
 	
 	String catName;
 	

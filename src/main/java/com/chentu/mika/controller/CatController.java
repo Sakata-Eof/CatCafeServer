@@ -7,6 +7,7 @@ import com.chentu.mika.model.result.Result;
 import com.chentu.mika.service.CatService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +22,11 @@ import java.util.List;
  */
 @RestController
 public class CatController {
-	
+
+	@Value("${prop.upload-folder}")
+	private String UPLOAD_FOLDER;
+
+
 	@Autowired
 	CatService catService;
 	
@@ -45,7 +50,7 @@ public class CatController {
 		try {
 			BufferedOutputStream out = new BufferedOutputStream(
 					new FileOutputStream(new File(
-							"src/main/resources/image/"+image.getOriginalFilename().hashCode()+".jpg")));
+							UPLOAD_FOLDER+image.getOriginalFilename().hashCode()+".jpg")));
 			out.write(image.getBytes());
 			out.flush();
 			out.close();
@@ -86,7 +91,7 @@ public class CatController {
 						 @RequestParam("catSex") Boolean sex,
 						 @RequestParam("catState") Boolean state,
 						 @RequestParam("catID") Integer ID) throws FileNotFoundException {
-		File file = new File("src/main/resources/image/"
+		File file = new File(UPLOAD_FOLDER
 				+catService
 				.getOne(Wrappers.<Cat>lambdaQuery()
 				.eq(Cat::getCatID, ID)).getCatImage());
@@ -97,7 +102,7 @@ public class CatController {
 		try {
 			BufferedOutputStream out = new BufferedOutputStream(
 					new FileOutputStream(new File(
-							"src/main/resources/image/"+image.getOriginalFilename().hashCode()+".jpg")));
+							UPLOAD_FOLDER+image.getOriginalFilename().hashCode()+".jpg")));
 			out.write(image.getBytes());
 			out.flush();
 			out.close();
@@ -142,7 +147,7 @@ public class CatController {
 			catRequest.setCatName(cat.getCatName());
 			catRequest.setCatBrief(cat.getCatBrief());
 			catRequest.setCatID(cat.getCatID());
-			catRequest.setCatImage("src/main/resources/image/"+cat.getCatImage());
+			catRequest.setCatImage(UPLOAD_FOLDER+cat.getCatImage());
 			reqList.add(catRequest);
 		}
 		return Result.success(reqList);

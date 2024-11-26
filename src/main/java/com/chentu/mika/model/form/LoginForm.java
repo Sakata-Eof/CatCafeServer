@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Data
 public class LoginForm implements Serializable {
 	
-	Integer userId;
+	Integer userID;
 	String userName;
 	String userEmail;
 	String userPassword;
