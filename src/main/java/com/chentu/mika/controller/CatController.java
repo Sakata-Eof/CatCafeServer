@@ -36,7 +36,7 @@ public class CatController {
 		String[] split = catIDs.split(",");
 		List<Integer> list = Arrays.stream(split).map(Integer::parseInt).toList();
 		catService.remove(Wrappers.<Cat>lambdaQuery()
-				.in(Cat::getCatId, list)
+				.in(Cat::getCatID, list)
 		);
 		return Result.success(null);
 	}
@@ -44,7 +44,7 @@ public class CatController {
 	@GetMapping("/cats/{catID}")
 	public Result get(@PathVariable("catID") Integer catID) {
 		Cat cat = catService.getOne(Wrappers.<Cat>lambdaQuery()
-				.eq(Cat::getCatId, catID));
+				.eq(Cat::getCatID, catID));
 		return Result.success(cat);
 	}
 	
@@ -53,7 +53,7 @@ public class CatController {
 		Cat cat = new Cat();
 		BeanUtils.copyProperties(form, cat);
 		catService.update(Wrappers.<Cat>lambdaUpdate()
-				.eq(Cat::getCatId, form.getCatId())
+				.eq(Cat::getCatID, form.getCatId())
 				.set(cat.getCatName()!=null,Cat::getCatName, cat.getCatName())
 				.set(cat.getCatImage()!=null,Cat::getCatImage, cat.getCatImage())
 				.set(cat.getCatAge()!=null,Cat::getCatAge, cat.getCatAge())

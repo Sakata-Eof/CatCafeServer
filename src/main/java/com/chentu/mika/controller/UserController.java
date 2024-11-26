@@ -41,7 +41,9 @@ public class UserController {
 		HashMap<String, Integer> hash = new HashMap<>();
 		hash.put("sub", one.getUserId());
 		hash.put("userType", one.getUserType()?1:0);
-		String sign = JWT.create().addPayloads(hash).setKey(JWTContent.JWT_SECRET_KEY.getBytes(StandardCharsets.UTF_8)).setExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 60)).sign();
+		String sign = JWT.create().addPayloads(hash).setKey("CATCAFE".getBytes()).
+				setExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 60)).
+				sign();
 		
 		return Result.success(sign);
 	}
