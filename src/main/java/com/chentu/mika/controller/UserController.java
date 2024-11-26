@@ -2,7 +2,6 @@ package com.chentu.mika.controller;
 
 import cn.hutool.jwt.JWT;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.chentu.mika.content.JWTContent;
 import com.chentu.mika.model.entity.User;
 import com.chentu.mika.model.form.LoginForm;
 import com.chentu.mika.model.result.Result;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -39,7 +37,7 @@ public class UserController {
 			throw new RuntimeException("用户名或密码错误");
 		}
 		HashMap<String, Integer> hash = new HashMap<>();
-		hash.put("sub", one.getUserId());
+		hash.put("sub", one.getUserID());
 		hash.put("userType", one.getUserType()?1:0);
 		String sign = JWT.create().addPayloads(hash).setKey("CATCAFE".getBytes()).
 				setExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 60)).

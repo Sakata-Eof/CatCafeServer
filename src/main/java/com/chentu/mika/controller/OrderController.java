@@ -27,7 +27,7 @@ public class OrderController {
 	@GetMapping("/orders/{orderID}")
 	public Result get(@PathVariable("orderID") Integer orderID) {
 		Order order = orderService.getOne(Wrappers.<Order>lambdaQuery()
-				.eq(Order::getOrderId, orderID)
+				.eq(Order::getOrderID, orderID)
 		);
 		return Result.success(order);
 	}
@@ -40,7 +40,7 @@ public class OrderController {
 	
 	@GetMapping("/orders/user/{userID}")
 	public Result list(@PathVariable("userID") Integer userID) {
-		List<Order> list = orderService.list(Wrappers.<Order>lambdaQuery().eq(Order::getUserId, userID));
+		List<Order> list = orderService.list(Wrappers.<Order>lambdaQuery().eq(Order::getUserID, userID));
 		return Result.success(list);
 	}
 	
@@ -49,7 +49,7 @@ public class OrderController {
 		String[] split = orderIDs.split(",");
 		for (String orderID : split) {
 			orderService.remove(Wrappers.<Order>lambdaQuery()
-					.in(Order::getOrderId, orderID)
+					.in(Order::getOrderID, orderID)
 			);
 		}
 		return Result.success(null);

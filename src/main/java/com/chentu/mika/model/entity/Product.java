@@ -12,7 +12,7 @@ import java.io.Serializable;
 @TableName("tb_product")
 public class Product implements Serializable {
 	
-	Integer productId;
+	Integer productID;
 	
 	String productName;
 	
