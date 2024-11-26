@@ -44,6 +44,7 @@ public class ProductController {
 		product.setProductImage(""+image.getOriginalFilename().hashCode()+".jpg");
 		product.setProductName(name);
 		product.setPrice(price);
+		product.setProductBrief(brief);
 
 		try {
 			BufferedOutputStream out = new BufferedOutputStream(
@@ -59,7 +60,7 @@ public class ProductController {
 			e.printStackTrace();
 			return Result.fail("上传失败");
 		}
-
+		productService.save(product);
 		return Result.success(null);
 	}
 	
@@ -76,14 +77,16 @@ public class ProductController {
 			if (file.isFile() && file.exists()) {
 				file.delete();
 			}
+			productService.remove(Wrappers.<Product>lambdaQuery()
+					.eq(Product::getProductID, i));
 		}
-		productService.removeByIds(Arrays.asList(productIDs.split(",")));
 		return Result.success(null);
 	}
 	
 	@GetMapping("/prdts/{productID}")
 	public Result get(@PathVariable("productID") Integer productID) {
-		Product product = productService.getById(productID);
+		Product product = productService.getOne(Wrappers.<Product>lambdaQuery()
+				.eq(Product::getProductID, productID));
 		return Result.success(product);
 	}
 	

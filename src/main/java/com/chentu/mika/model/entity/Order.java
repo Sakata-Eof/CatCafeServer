@@ -1,9 +1,11 @@
 package com.chentu.mika.model.entity;
 
+import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -23,7 +25,8 @@ public class Order implements Serializable {
 	Double productPrice;
 	
 	Integer count;
-	Date orderTime;
+
+	LocalDateTime orderTime;
 	
 	Integer orderPay;
 }
