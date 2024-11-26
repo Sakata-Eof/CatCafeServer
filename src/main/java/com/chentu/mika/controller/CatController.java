@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -28,15 +29,33 @@ public class CatController {
 	@ResponseBody
 	public Result add(@RequestParam("catImage") MultipartFile image,
 					  @RequestParam("catName") String name,
-					  @RequestParam("catAge")Integer age) {
+					  @RequestParam("catAge") Integer age,
+					  @RequestParam("catBrief") String brief,
+					  @RequestParam("catSex") Boolean sex,
+					  @RequestParam("catState") Boolean state) throws FileNotFoundException {
 		
 		Cat cat = new Cat();
 
-		cat.setCatImage(""+image.getOriginalFilename().hashCode());
+		cat.setCatImage(""+image.getOriginalFilename().hashCode()+".jpg");
 		cat.setCatName(name);
 		cat.setCatAge(age);
-
-		//错的
+		cat.setCatBrief(brief);
+		cat.setCatSex(sex?1:0);
+		cat.setCatState(state?1:0);
+		try {
+			BufferedOutputStream out = new BufferedOutputStream(
+					new FileOutputStream(new File(
+							"src/main/resources/image/"+image.getOriginalFilename().hashCode()+".jpg")));
+			out.write(image.getBytes());
+			out.flush();
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return Result.fail("上传失败");
+		} catch (IOException e) {
+			e.printStackTrace();
+			return Result.fail("上传失败");
+		}
 		catService.save(cat);
 		return Result.success(null);
 	}
@@ -59,39 +78,74 @@ public class CatController {
 	}
 	
 	@PutMapping("/cats")
-	public Result update(@RequestBody CatForm form) {
-		Cat cat = new Cat();
-		BeanUtils.copyProperties(form, cat);
+	@ResponseBody
+	public Result update(@RequestParam("catImage") MultipartFile image,
+						 @RequestParam("catName") String name,
+						 @RequestParam("catAge") Integer age,
+						 @RequestParam("catBrief") String brief,
+						 @RequestParam("catSex") Boolean sex,
+						 @RequestParam("catState") Boolean state,
+						 @RequestParam("catID") Integer ID) throws FileNotFoundException {
+		File file = new File("src/main/resources/image/"
+				+catService
+				.getOne(Wrappers.<Cat>lambdaQuery()
+				.eq(Cat::getCatID, ID)).getCatImage());
+		// 路径为文件且不为空则进行删除
+		if (file.isFile() && file.exists()) {
+			file.delete();
+		}
+		try {
+			BufferedOutputStream out = new BufferedOutputStream(
+					new FileOutputStream(new File(
+							"src/main/resources/image/"+image.getOriginalFilename().hashCode()+".jpg")));
+			out.write(image.getBytes());
+			out.flush();
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return Result.fail("上传失败");
+		} catch (IOException e) {
+			e.printStackTrace();
+			return Result.fail("上传失败");
+		}
 		catService.update(Wrappers.<Cat>lambdaUpdate()
-				.eq(Cat::getCatID, form.getCatId())
-				.set(cat.getCatName()!=null,Cat::getCatName, cat.getCatName())
-				.set(cat.getCatImage()!=null,Cat::getCatImage, cat.getCatImage())
-				.set(cat.getCatAge()!=null,Cat::getCatAge, cat.getCatAge())
-				.set(cat.getCatBrief()!=null,Cat::getCatBrief, cat.getCatBrief())
-				.set(cat.getCatSex()!=null,Cat::getCatSex, cat.getCatSex())
-				.set(cat.getCatState()!=null,Cat::getCatState, cat.getCatState())
+				.eq(Cat::getCatID, ID)
+				.set(name!=null,Cat::getCatName, name)
+				.set(image!=null,Cat::getCatImage, ""+image.getOriginalFilename().hashCode()+".jpg")
+				.set(age!=null,Cat::getCatAge, age)
+				.set(brief!=null,Cat::getCatBrief, brief)
+				.set(sex!=null,Cat::getCatSex, sex?1:0)
+				.set(state!=null,Cat::getCatState, state?1:0)
 		);
 		return Result.success(null);
 	}
 	
 	@GetMapping("/cats")
 	public Result list() {
-		/*List<Cat> catList = catService.list();
-		CatRequest catRequest = new CatRequest();
+		List<Cat> catList = catService.list();
 		List<CatRequest> reqList = new ArrayList<>();
-		Iterator<CatRequest> iterator = reqList.iterator();
 		for (Cat cat : catList) {
+			CatRequest catRequest = new CatRequest();
 			if(cat.getCatState()==1){
-				catRequest = iterator.next();
 				catRequest.setCatState(true);
 			}
 			else{
-
+				catRequest.setCatState(false);
 			}
+			if (cat.getCatSex() == 1) {
+				catRequest.setCatSex(true);
+			}
+			else {
+				catRequest.setCatSex(false);
+			}
+			catRequest.setCatAge(cat.getCatAge());
+			catRequest.setCatName(cat.getCatName());
+			catRequest.setCatBrief(cat.getCatBrief());
 			catRequest.setCatID(cat.getCatID());
 			catRequest.setCatImage("src/main/resources/image/"+cat.getCatImage());
-		}*/
-		return Result.success(catService.list());
+			reqList.add(catRequest);
+		}
+		return Result.success(reqList);
 	}
 }
 
@@ -109,7 +163,7 @@ class CatRequest {
 
 	private String catBrief;
 
-	private Integer catSex;
+	private boolean catSex;
 
 	private boolean catState;
 	public Integer getCatID() {
@@ -148,16 +202,16 @@ class CatRequest {
 		return catBrief;
 	}
 
-	public void setCatBrief(String catBrief) {
-		this.catBrief = catBrief;
-	}
-
-	public Integer getCatSex() {
+	public boolean isCatSex() {
 		return catSex;
 	}
 
-	public void setCatSex(Integer catSex) {
+	public void setCatSex(boolean catSex) {
 		this.catSex = catSex;
+	}
+
+	public void setCatBrief(String catBrief) {
+		this.catBrief = catBrief;
 	}
 
 	public boolean isCatState() {
