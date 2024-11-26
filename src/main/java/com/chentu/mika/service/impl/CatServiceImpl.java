@@ -8,10 +8,7 @@ import com.chentu.mika.model.entity.User;
 import com.chentu.mika.service.CatService;
 import org.springframework.stereotype.Service;
 
-/**
- * @author: LiZhong Wang
- * @createTime: 2024/11/25 21:59
- * @description:
+/*
  */
 @Service
 public class CatServiceImpl  extends ServiceImpl<CatMapper, Cat> implements CatService {

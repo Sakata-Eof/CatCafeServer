@@ -9,9 +9,6 @@ import com.chentu.mika.service.OrderService;
 import org.springframework.stereotype.Service;
 
 /**
- * @author: LiZhong Wang
- * @createTime: 2024/11/25 22:36
- * @description:
  */
 @Service
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements OrderService {

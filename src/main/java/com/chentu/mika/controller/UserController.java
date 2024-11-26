@@ -23,27 +23,65 @@ public class UserController {
 	
 	@Autowired
 	UserService userService;
-	
 	@PostMapping("/login")
 	public Result login(@RequestBody LoginForm form) {
-		Assert.notNull(form, "参数不能为空");
-		Assert.notNull(form.getUserEmail(), "邮箱不能为空");
-		Assert.notNull(form.getUserPassword(), "密码不能为空");
-		User one = userService.getOne(Wrappers.<User>lambdaQuery()
-				.eq(User::getUserEmail, form.getUserEmail())
-				.eq(User::getUserPassword, form.getUserPassword())
-		);
-		if (one == null) {
-			throw new RuntimeException("用户名或密码错误");
+		if(form.getUserEmail()!=null||form.getUserId()!=null||form.getUserName()!=null){
+			if(form.getUserEmail()!=null) {
+				User one = userService.getOne(Wrappers.<User>lambdaQuery()
+						.eq(User::getUserEmail, form.getUserEmail())
+						.eq(User::getUserPassword, form.getUserPassword())
+				);
+				if (one == null) {
+					throw new RuntimeException("用户名或密码错误");
+				}
+				HashMap<String, Integer> hash = new HashMap<>();
+				hash.put("sub", one.getUserID());
+				hash.put("userType", one.getUserType()?1:0);
+				String sign = JWT.create().addPayloads(hash).setKey("CATCAFE".getBytes()).
+						setExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 60)).
+						sign();
+
+				return Result.success(sign);
+			}
+			if(form.getUserId()!=null) {
+				User one = userService.getOne(Wrappers.<User>lambdaQuery()
+						.eq(User::getUserID, form.getUserEmail())
+						.eq(User::getUserPassword, form.getUserPassword())
+				);
+				if (one == null) {
+					throw new RuntimeException("用户名或密码错误");
+				}
+				HashMap<String, Integer> hash = new HashMap<>();
+				hash.put("sub", one.getUserID());
+				hash.put("userType", one.getUserType()?1:0);
+				String sign = JWT.create().addPayloads(hash).setKey("CATCAFE".getBytes()).
+						setExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 60)).
+						sign();
+
+				return Result.success(sign);
+			}
+			if(form.getUserName()!=null) {
+				User one = userService.getOne(Wrappers.<User>lambdaQuery()
+						.eq(User::getUserName, form.getUserEmail())
+						.eq(User::getUserPassword, form.getUserPassword())
+				);
+				if (one == null) {
+					throw new RuntimeException("用户名或密码错误");
+				}
+				HashMap<String, Integer> hash = new HashMap<>();
+				hash.put("sub", one.getUserID());
+				hash.put("userType", one.getUserType()?1:0);
+				String sign = JWT.create().addPayloads(hash).setKey("CATCAFE".getBytes()).
+						setExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 60)).
+						sign();
+
+				return Result.success(sign);
+			}
+			return Result.fail("");
 		}
-		HashMap<String, Integer> hash = new HashMap<>();
-		hash.put("sub", one.getUserID());
-		hash.put("userType", one.getUserType()?1:0);
-		String sign = JWT.create().addPayloads(hash).setKey("CATCAFE".getBytes()).
-				setExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 60)).
-				sign();
-		
-		return Result.success(sign);
+		else {
+			throw new RuntimeException("三个参数为空");
+		}
 	}
 	
 	@PostMapping("/register")

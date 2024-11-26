@@ -9,9 +9,6 @@ import com.chentu.mika.service.ProductService;
 import org.springframework.stereotype.Service;
 
 /**
- * @author: LiZhong Wang
- * @createTime: 2024/11/25 22:19
- * @description:
  */
 @Service
 public class ProductServiceImpl  extends ServiceImpl<ProductMapper, Product> implements ProductService {
