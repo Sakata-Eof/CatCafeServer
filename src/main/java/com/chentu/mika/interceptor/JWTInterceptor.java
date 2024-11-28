@@ -24,13 +24,13 @@ public class JWTInterceptor implements HandlerInterceptor {
 		}
 		
 		if (request.getHeader("Authorization") == null || request.getHeader("Authorization").isEmpty()) {
-			return false;
+			return true;
 		}
 		try {
 			String token = request.getHeader("Authorization").substring(7);
 			Object claim = JWT.of(token).getPayload().getClaim("sub");
 			if (claim == null) {
-				return false;
+				return true;
 			}
 			Long id = Convert.toLong(claim);
 			BaseContent.setId(id.toString());

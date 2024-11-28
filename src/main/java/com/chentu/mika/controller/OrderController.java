@@ -31,7 +31,7 @@ public class OrderController {
 	public Result add(@RequestBody Map map) {
 		Order order = new Order();
 		LocalDateTime time = DateTime.of((String)map.get("orderTime"),DatePattern.NORM_DATETIME_PATTERN).toLocalDateTime();
-		order.setUserID((Integer) map.get("userID"));
+		order.setUserID(1);
 		order.setProductCode((Integer) map.get("productID"));
 		order.setProductPrice((Double)map.get("productPrice"));
 		order.setCount((Integer)map.get("productCount"));
@@ -84,9 +84,9 @@ public class OrderController {
 	
 	@GetMapping("/orders/{userID}")
 	public Result list(@PathVariable("userID") Integer userID) {
-		QueryWrapper<Order> qw = new QueryWrapper<>();
-		qw.eq("user_i_d", userID);
-		List<Order> list = orderService.list(qw);
+		/*QueryWrapper<Order> qw = new QueryWrapper<>();
+		qw.eq("user_i_d", userID);*/
+		List<Order> list = orderService.list();
 
 		return Result.success(list);
 	}

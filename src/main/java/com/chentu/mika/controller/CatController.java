@@ -157,7 +157,7 @@ public class CatController {
 			catRequest.setCatName(cat.getCatName());
 			catRequest.setCatBrief(cat.getCatBrief());
 			catRequest.setCatID(cat.getCatID());
-			catRequest.setCatImage(UPLOAD_FOLDER+cat.getCatImage());
+			catRequest.setCatImage(cat.getCatImage());
 			reqList.add(catRequest);
 		}
 		return Result.success(reqList);
