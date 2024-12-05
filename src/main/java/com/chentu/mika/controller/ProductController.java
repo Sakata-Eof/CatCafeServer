@@ -36,9 +36,6 @@ public class ProductController {
 					  @RequestParam("productImage") MultipartFile image,
 					  @RequestParam("productBrief") String brief,
 					  @RequestParam("price") Double price)throws FileNotFoundException {
-		Assert.notNull(name, "商品名称不能为空");
-		Assert.notNull(price, "商品价格不能为空");
-
 		Product product=new Product();
 
 		product.setProductImage(""+image.getOriginalFilename().hashCode()+".jpg");

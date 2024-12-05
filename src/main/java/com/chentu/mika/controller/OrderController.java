@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
 
 /**
  * @description:处理与订单相关的API请求
@@ -31,7 +28,7 @@ public class OrderController {
 	public Result add(@RequestBody Map map) {
 		Order order = new Order();
 		LocalDateTime time = DateTime.of((String)map.get("orderTime"),DatePattern.NORM_DATETIME_PATTERN).toLocalDateTime();
-		order.setUserID(1);
+		order.setUserID((Integer) map.get("userID"));
 		order.setProductCode((Integer) map.get("productID"));
 		order.setProductPrice((Double)map.get("productPrice"));
 		order.setCount((Integer)map.get("productCount"));
@@ -50,18 +47,15 @@ public class OrderController {
 		*/
 		LocalDateTime orderTime = (LocalDateTime) map.get("order_time");
 
-		String[] splitted = orderTime.toString().split("T");
-		StringJoiner sj = new StringJoiner(" ").add(splitted[0]).add(splitted[1]);
-		DateTime time = DateTime.of(sj.toString(), DatePattern.NORM_DATETIME_PATTERN);
-		Order order = new Order();
+		OrderRequest order = new OrderRequest();
 		BigDecimal productPrice = new BigDecimal(map.get("product_price").toString());
 		order.setOrderID((Integer) map.get("order_i_d"));
 		order.setUserID((Integer) map.get("user_i_d"));
-		order.setProductCode((Integer) map.get("product_code"));
+		order.setProductID((Integer) map.get("product_code"));
 		order.setProductPrice(productPrice.doubleValue());
-		order.setCount((Integer)map.get("count"));
+		order.setProductCount((Integer)map.get("count"));
 		order.setOrderTime(orderTime);
-		order.setOrderPay((Boolean)map.get("order_pay")?1:0);
+		order.setOrderPay((Boolean)map.get("order_pay"));
 		return Result.success(order);
 	}
 	
@@ -84,11 +78,22 @@ public class OrderController {
 	
 	@GetMapping("/orders/{userID}")
 	public Result list(@PathVariable("userID") Integer userID) {
-		/*QueryWrapper<Order> qw = new QueryWrapper<>();
-		qw.eq("user_i_d", userID);*/
-		List<Order> list = orderService.list();
-
-		return Result.success(list);
+		//获取userID所对应的order，包装成OrderRequest的list发送
+		List<OrderRequest> orders = new ArrayList<>();
+		for (Order order : orderService.list()) {
+			if(order.getUserID().equals(userID)) {
+				OrderRequest temp = new OrderRequest();
+				temp.setOrderID(order.getOrderID());
+				temp.setUserID(order.getUserID());
+				temp.setProductID(order.getProductCode());
+				temp.setProductPrice(order.getProductPrice());
+				temp.setOrderTime(order.getOrderTime());
+				temp.setOrderPay(order.getOrderPay() == 1);
+				temp.setProductCount(order.getCount());
+				orders.add(temp);
+			}
+		}
+		return Result.success(orders);
 	}
 	
 	@DeleteMapping("/orders/{userID}/{orderIDs}")
@@ -102,4 +107,70 @@ public class OrderController {
 		return Result.success(null);
 	}
 	
+}
+
+class OrderRequest{
+	private Integer orderID;
+	private Integer userID;
+	private Integer productID;
+	private double productPrice;
+	private Integer productCount;
+	private LocalDateTime orderTime;
+	private boolean orderPay;
+
+	public boolean isOrderPay() {
+		return orderPay;
+	}
+
+	public void setOrderPay(boolean orderPay) {
+		this.orderPay = orderPay;
+	}
+
+	public LocalDateTime getOrderTime() {
+		return orderTime;
+	}
+
+	public void setOrderTime(LocalDateTime orderTime) {
+		this.orderTime = orderTime;
+	}
+
+	public Integer getProductCount() {
+		return productCount;
+	}
+
+	public void setProductCount(Integer productCount) {
+		this.productCount = productCount;
+	}
+
+	public double getProductPrice() {
+		return productPrice;
+	}
+
+	public void setProductPrice(double productPrice) {
+		this.productPrice = productPrice;
+	}
+
+	public Integer getProductID() {
+		return productID;
+	}
+
+	public void setProductID(Integer productID) {
+		this.productID = productID;
+	}
+
+	public Integer getUserID() {
+		return userID;
+	}
+
+	public void setUserID(Integer userID) {
+		this.userID = userID;
+	}
+
+	public Integer getOrderID() {
+		return orderID;
+	}
+
+	public void setOrderID(Integer orderID) {
+		this.orderID = orderID;
+	}
 }
