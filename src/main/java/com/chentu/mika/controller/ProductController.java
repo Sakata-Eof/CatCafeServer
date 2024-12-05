@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @description:处理与产品相关的API请求
@@ -38,7 +39,11 @@ public class ProductController {
 					  @RequestParam("price") Double price)throws FileNotFoundException {
 		Product product=new Product();
 
-		product.setProductImage(""+image.getOriginalFilename().hashCode()+".jpg");
+		int index=image.getOriginalFilename().lastIndexOf(".");
+		String suffix=image.getOriginalFilename().substring(index);//获取后缀名
+		//使用随机生成的UUID做文件名
+		String fileName = UUID.randomUUID().toString().replace("-","")+suffix;
+		product.setProductImage(fileName);
 		product.setProductName(name);
 		product.setPrice(price);
 		product.setProductBrief(brief);
@@ -46,7 +51,7 @@ public class ProductController {
 		try {
 			BufferedOutputStream out = new BufferedOutputStream(
 					new FileOutputStream(new File(
-							UPLOAD_FOLDER+image.getOriginalFilename().hashCode()+".jpg")));
+							UPLOAD_FOLDER+fileName)));
 			out.write(image.getBytes());
 			out.flush();
 			out.close();
@@ -102,10 +107,14 @@ public class ProductController {
 		if (file.isFile() && file.exists()) {
 			file.delete();
 		}
+		int index=image.getOriginalFilename().lastIndexOf(".");
+		String suffix=image.getOriginalFilename().substring(index);//获取后缀名
+		//使用随机生成的UUID做文件名
+		String fileName = UUID.randomUUID().toString().replace("-","")+suffix;
 		try {
 			BufferedOutputStream out = new BufferedOutputStream(
-					new FileOutputStream(new File(
-							UPLOAD_FOLDER+image.getOriginalFilename().hashCode()+".jpg")));
+					new FileOutputStream(
+							new File(UPLOAD_FOLDER+fileName)));
 			out.write(image.getBytes());
 			out.flush();
 			out.close();
@@ -119,7 +128,7 @@ public class ProductController {
 		productService.update(Wrappers.<Product>lambdaUpdate()
 				.eq(Product::getProductID, ID)
 				.set(name!=null,Product::getProductName, name)
-				.set(image!=null,Product::getProductImage, ""+image.getOriginalFilename().hashCode()+".jpg")
+				.set(image!=null,Product::getProductImage, fileName)
 				.set(brief!=null,Product::getProductBrief, brief)
 				.set(price!=null,Product::getPrice, price)
 		);

@@ -12,10 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @description:与猫相关的API请求
@@ -40,8 +37,11 @@ public class CatController {
 					  @RequestParam("catState") Boolean state) throws FileNotFoundException {
 		
 		Cat cat = new Cat();
-
-		cat.setCatImage(""+image.getOriginalFilename().hashCode()+".jpg");
+		int index= Objects.requireNonNull(image.getOriginalFilename()).lastIndexOf(".");
+		String suffix=image.getOriginalFilename().substring(index);//获取后缀名
+		//使用随机生成的UUID做文件名
+		String fileName = UUID.randomUUID().toString().replace("-","")+suffix;
+		cat.setCatImage(fileName);//数据库里存文件名
 		cat.setCatName(name);
 		cat.setCatAge(age);
 		cat.setCatBrief(brief);
@@ -50,7 +50,7 @@ public class CatController {
 		try {
 			BufferedOutputStream out = new BufferedOutputStream(
 					new FileOutputStream(new File(
-							UPLOAD_FOLDER+image.getOriginalFilename().hashCode()+".jpg")));
+							UPLOAD_FOLDER+fileName)));
 			out.write(image.getBytes());
 			out.flush();
 			out.close();
@@ -71,9 +71,10 @@ public class CatController {
 		List<Integer> list = Arrays.stream(split).map(Integer::parseInt).toList();
 		for (Integer i : list) {
 			File file = new File(UPLOAD_FOLDER
-					+catService
-					.getOne(Wrappers.<Cat>lambdaQuery()
-							.eq(Cat::getCatID, i)).getCatImage());
+					+catService.getOne(
+							Wrappers.<Cat>lambdaQuery()
+									.eq(Cat::getCatID, i)
+			).getCatImage());
 			// 路径为文件且不为空则进行删除
 			if (file.isFile() && file.exists()) {
 				file.delete();
@@ -109,10 +110,14 @@ public class CatController {
 		if (file.isFile() && file.exists()) {
 			file.delete();
 		}
+		int index= Objects.requireNonNull(image.getOriginalFilename()).lastIndexOf(".");
+		String suffix=image.getOriginalFilename().substring(index);//获取后缀名
+		//使用随机生成的UUID做文件名
+		String fileName = UUID.randomUUID().toString().replace("-","")+suffix;
 		try {
 			BufferedOutputStream out = new BufferedOutputStream(
 					new FileOutputStream(new File(
-							UPLOAD_FOLDER+image.getOriginalFilename().hashCode()+".jpg")));
+							UPLOAD_FOLDER+fileName)));
 			out.write(image.getBytes());
 			out.flush();
 			out.close();
@@ -126,7 +131,7 @@ public class CatController {
 		catService.update(Wrappers.<Cat>lambdaUpdate()
 				.eq(Cat::getCatID, ID)
 				.set(name!=null,Cat::getCatName, name)
-				.set(image!=null,Cat::getCatImage, ""+image.getOriginalFilename().hashCode()+".jpg")
+				.set(image!=null,Cat::getCatImage, fileName)
 				.set(age!=null,Cat::getCatAge, age)
 				.set(brief!=null,Cat::getCatBrief, brief)
 				.set(sex!=null,Cat::getCatSex, sex?1:0)
